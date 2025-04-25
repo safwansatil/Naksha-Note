@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>In Progress Editor</title>
+  <style>
+    #sum { background-color: greenyellow; color: black; }
+    #mod { background-color: indigo; color: whitesmoke; }
+    #response { margin-top: 1em; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <form id="aiForm">
+    <input type="text" id="userInput" name="userInput" placeholder="Enter text…" required />
+    <button type="submit" id="sum">Summarize</button>
+    <button type="button" id="mod">Modify</button>
+  </form>
+  <div id="response"></div>
+
+  <script type="module">
+    //Import 
+    import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";  // :contentReference[oaicite:0]{index=0}
+
+    // API key
+    const apiKey = "AIzaSyBs381LGOePP1TSoZOEDAGAiLm11ypsInU";      // ← replace with your real key
+    const genAI = new GoogleGenerativeAI(apiKey);
+
+    // Select elements
+    const aiForm = document.querySelector('#aiForm');
+    const userInput = document.querySelector('#userInput');
+    const btnSummarize = document.querySelector('#sum');
+    const btnModify   = document.querySelector('#mod');
+    const responseDiv = document.querySelector('#response');
+
+    // Helper: call Gemini
+    async function callGemini(promptText) {
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });   
+      const result = await model.generateContent(promptText);
+      return result.response.text();
+    }
+
+    // Summarize
+    aiForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const text = userInput.value;
+      responseDiv.textContent = '…thinking…';
+      const reply = await callGemini(`Please summarize the following text in one sentence:\n\n${text}`);
+      responseDiv.textContent = reply;
+    });
+
+    // Modify
+    btnModify.addEventListener('click', async () => {
+      const text = userInput.value;
+      responseDiv.textContent = '…thinking…';
+      const reply = await callGemini(`Please rewrite the following text to be more easy to understand and highlight the important parts and concepts for exams:\n\n${text}`);
+      responseDiv.textContent = reply;
+    });
+  </script>
+</body>
+</html>
