@@ -71,13 +71,13 @@
       const file = fileInput.files[0];
       if (!file) return;
       extractedText = '';
-      addResponse('Info', 'Extracting text from file...');
+      addResponse('Info', 'Hold up...');
       if (file.type === 'application/pdf') {
         extractedText = await extractTextFromPDF(file);
       } else if (file.type.startsWith('image/')) {
         extractedText = await extractTextFromImage(file);
       }
-      addResponse('Info', 'File text extracted. Ready for actions.');
+      addResponse('Info', 'All good, select an action please');
     });
 
     function getInputText() {
