@@ -2,59 +2,133 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>In Progress Editor</title>
-  <style>
-    #sum { background-color: greenyellow; color: black; }
-    #mod { background-color: indigo; color: whitesmoke; }
-    #response { margin-top: 1em; white-space: pre-wrap; }
-  </style>
+  <title>Note Editor</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <h1>Welcome!!</h1>
   <form id="aiForm">
-    <input type="text" id="userInput" name="userInput" placeholder="Enter text…" required />
-    <button type="submit" id="sum">Summarize</button>
-    <button type="button" id="mod">Modify</button>
+    <label for="textInput">Enter text:</label>
+    <textarea id="textInput" name="textInput" placeholder="Enter text…"></textarea>
+
+    <div class="file-row">
+      <label for="fileInput">Or select a PDF/Image:</label>
+      <input type="file" id="fileInput" accept=".pdf,image/*" />
+    </div>
+
+    <div class="buttons">
+      <button type="submit" id="sum">Summarize</button>
+      <button type="button" id="mod">Modify</button>
+      <button type="button" id="key">Keywords</button>
+      <button type="button" id="enh">Enhancement</button>
+      <!-- <button type="button" id="flash">FlashCards?</button> -->
+    </div>
   </form>
-  <div id="response"></div>
+
+  <ul id="responses"></ul>
+
+  <!-- PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.js"></script>
+  <!-- Tesseract.js -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
 
   <script type="module">
-    //Import 
-    import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";  
-
-    // API key
-    const apiKey = "AIzaSyBs381LGOePP1TSoZOEDAGAiLm11ypsInU";     
+    import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+    const apiKey = "AIzaSyBs381LGOePP1TSoZOEDAGAiLm11ypsInU";
     const genAI = new GoogleGenerativeAI(apiKey);
 
-    // Select elements
-    const aiForm = document.querySelector('#aiForm');
-    const userInput = document.querySelector('#userInput');
-    const btnSummarize = document.querySelector('#sum');
-    const btnModify   = document.querySelector('#mod');
-    const responseDiv = document.querySelector('#response');
+    const form = document.querySelector('#aiForm');
+    const textInput = document.querySelector('#textInput');
+    const fileInput = document.querySelector('#fileInput');
+    const responsesList = document.querySelector('#responses');
 
-    // Helper: call Gemini
+    let extractedText = '';
+
     async function callGemini(promptText) {
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });   
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
       const result = await model.generateContent(promptText);
       return result.response.text();
     }
 
-    // Summarize
-    aiForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      const text = userInput.value;
-      responseDiv.textContent = '…thinking…';
-      const reply = await callGemini(`Please summarize the following text in one sentence:\n\n${text}`);
-      responseDiv.textContent = reply;
+    async function extractTextFromPDF(file) {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let text = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        text += content.items.map(item => item.str).join(' ') + '\n';
+      }
+      return text;
+    }
+
+    async function extractTextFromImage(file) {
+      const { data: { text } } = await Tesseract.recognize(file, 'eng');
+      return text;
+    }
+
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      extractedText = '';
+      addResponse('Info', 'Extracting text from file...');
+      if (file.type === 'application/pdf') {
+        extractedText = await extractTextFromPDF(file);
+      } else if (file.type.startsWith('image/')) {
+        extractedText = await extractTextFromImage(file);
+      }
+      addResponse('Info', 'File text extracted. Ready for actions.');
     });
 
-    // Modify
-    btnModify.addEventListener('click', async () => {
-      const text = userInput.value;
-      responseDiv.textContent = '…thinking…';
-      const reply = await callGemini(`Please rewrite the following text to be more easy to understand and highlight the important parts and concepts for exams:\n\n${text}`);
-      responseDiv.textContent = reply;
+    function getInputText() {
+      const txt = textInput.value.trim();
+      return txt || extractedText;
+    }
+
+    function addResponse(title, content) {
+      const li = document.createElement('li');
+      const h2 = document.createElement('h2');
+      h2.textContent = title;
+      const p = document.createElement('div');
+      p.textContent = content;
+      li.append(h2, p);
+      responsesList.prepend(li);
+    }
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const text = getInputText();
+      if (!text){
+       return addResponse('Error', 'Please enter text or select a file.');}
+      addResponse('Summarize', '…thinking…');
+      const summary = await callGemini(`Please summarize the following text, the summary should grasp the main concepts and be about 25 to 30% in size of the original content:\n\n${text}`);
+      responsesList.querySelector('li:first-child div').textContent = summary;
+    });
+
+    document.querySelector('#mod').addEventListener('click', async () => {
+      const text = getInputText();
+      if (!text) return addResponse('Error', 'Please enter text or select a file.');
+      addResponse('Modify', '…thinking…');
+      const mod = await callGemini(`Please rewrite the following text to be easier to understand and highlight the important parts and concepts for exams:\n\n${text}`);
+      responsesList.querySelector('li:first-child div').textContent = mod;
+    });
+
+    document.querySelector('#key').addEventListener('click', async () => {
+      const text = getInputText();
+      if (!text) return addResponse('Error', 'Please enter text or select a file.');
+      addResponse('Keywords', '…thinking…');
+      const keys = await callGemini(`Extract the key keywords and important topics from the following text to help a learner remember:\n\n${text}`);
+      responsesList.querySelector('li:first-child div').textContent = keys;
+    });
+
+    document.querySelector('#enh').addEventListener('click', async () => {
+      const text = getInputText();
+      if (!text) return addResponse('Error', 'Please enter text or select a file.');
+      addResponse('Enhancement', '…thinking…');
+      const enh = await callGemini(`Enhance the following text by elaborating on key takeaways, concepts missed, and provide deeper explanations to learn better:\n\n${text}`);
+      responsesList.querySelector('li:first-child div').textContent = enh;
     });
   </script>
+
 </body>
 </html>
