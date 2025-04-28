@@ -1,22 +1,41 @@
 // Elements
 const sidebarContent = document.getElementById('sidebarContent');
 const pageTitle = document.getElementById('pageTitle');
-//const editorContent = document.getElementById('editorContent');
-const addButton = document.querySelector('.sidebar-header .add-button'); // Adjusted selector if button is inside header
+const editorContent = document.getElementById('editorContent');
+const addButton = document.querySelector('.sidebar-header .add-button');
 const fileContextMenu = document.getElementById('fileContextMenu');
 const sidebarParticles = document.getElementById('sidebarParticles');
-const sidebar = document.querySelector('.sidebar'); // Added for collapse
-const appContainer = document.querySelector('.app-container'); // Added for collapse
-const toggleSidebarBtn = document.getElementById('toggleSidebarBtn'); // Added for collapse
+const sidebar = document.querySelector('.sidebar');
+const appContainer = document.querySelector('.app-container');
+const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
+
+// AI Tools Elements
+const aiToolsContainer = document.createElement('div');
+aiToolsContainer.className = 'ai-tools-container';
+const aiTools = document.createElement('div');
+aiTools.className = 'ai-tools';
+aiTools.innerHTML = `
+    <button id="summarizeBtn" class="ai-tool-btn">Summarize</button>
+    <button id="modifyBtn" class="ai-tool-btn">Modify</button>
+    <button id="keywordsBtn" class="ai-tool-btn">Keywords</button>
+    <button id="enhanceBtn" class="ai-tool-btn">Enhance</button>
+    <button id="paraphraseBtn" class="ai-tool-btn">Paraphrase</button>
+`;
+aiToolsContainer.appendChild(aiTools);
+document.querySelector('.editor-container').appendChild(aiToolsContainer);
 
 // State variables
 let files = [];
 let currentFileId = null;
 let contextMenuTargetId = null;
-let renameInput = null; // Track the rename input element
-let isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true'; // Added for collapse state
+let renameInput = null;
+let isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
 
-// Check if user is logged in
+// Gemini API Configuration
+const apiKey = "YOUR_GEMINI_API_KEY"; // Replace with your actual API key
+const genAI = new GoogleGenerativeAI(apiKey);
+
+// Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
     console.log("Canvas page loaded");
 
@@ -24,48 +43,47 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!currentUser) {
         console.log("User not logged in, redirecting");
         window.location.href = 'login.html';
-        return; // Stop further execution if not logged in
+        return;
     }
 
-    initSidebarParticles(); // Initialize sidebar particles
-    applySidebarState(); // Apply initial collapse state
+    initSidebarParticles();
+    applySidebarState();
     loadFiles();
     setupCanvasEventListeners();
+    setupAIEventListeners();
 });
-
 
 // Initialize sidebar particles animation
 function initSidebarParticles() {
-  console.log("Initializing sidebar particles");
-  if (!sidebarParticles) return;
+    console.log("Initializing sidebar particles");
+    if (!sidebarParticles) return;
 
-  sidebarParticles.innerHTML = ''; // Clear existing
-  const particleCount = 15; // Adjust density
+    sidebarParticles.innerHTML = ''; // Clear existing
+    const particleCount = 15; // Adjust density
 
-  for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement('div');
-      particle.classList.add('sidebar-particle'); // Use the CSS class for styling
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('sidebar-particle'); // Use the CSS class for styling
 
-      const size = Math.random() * 5 + 2; // Smaller particles
-      particle.style.width = `${size}px`;
-      particle.style.height = `${size}px`;
-      particle.style.position = 'absolute'; // Ensure positioning works
-      particle.style.backgroundColor = 'var(--theme-green)'; // Use theme color
-      particle.style.borderRadius = '50%';
+        const size = Math.random() * 5 + 2; // Smaller particles
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.position = 'absolute'; // Ensure positioning works
+        particle.style.backgroundColor = 'var(--theme-green)'; // Use theme color
+        particle.style.borderRadius = '50%';
 
-      // Random position within the sidebar
-      particle.style.top = `${Math.random() * 100}%`;
-      particle.style.left = `${Math.random() * 100}%`;
+        // Random position within the sidebar
+        particle.style.top = `${Math.random() * 100}%`;
+        particle.style.left = `${Math.random() * 100}%`;
 
-      // Random animation properties
-      particle.style.opacity = Math.random() * 0.4 + 0.1; // Subtle opacity
-      particle.style.animationDuration = `${Math.random() * 8 + 5}s`;
-      particle.style.animationDelay = `${Math.random() * 5}s`;
+        // Random animation properties
+        particle.style.opacity = Math.random() * 0.4 + 0.1; // Subtle opacity
+        particle.style.animationDuration = `${Math.random() * 8 + 5}s`;
+        particle.style.animationDelay = `${Math.random() * 5}s`;
 
-      sidebarParticles.appendChild(particle);
-  }
+        sidebarParticles.appendChild(particle);
+    }
 }
-
 
 // Load files from local storage
 function loadFiles() {
@@ -74,7 +92,7 @@ function loadFiles() {
     try {
         files = storedFiles ? JSON.parse(storedFiles) : [];
         if (!Array.isArray(files)) { // Ensure it's an array
-           files = [];
+            files = [];
         }
     } catch (error) {
         console.error("Error parsing files from localStorage:", error);
@@ -85,9 +103,9 @@ function loadFiles() {
 
     sidebarContent.innerHTML = ''; // Clear existing items
     if (files.length === 0) {
-         pageTitle.textContent = "No files yet";
-         editorContent.innerHTML = '<p>Create your first file using the "+ New File" button in the sidebar.</p>';
-         editorContent.contentEditable = "false"; // Disable editing when no file selected
+        pageTitle.textContent = "No files yet";
+        editorContent.innerHTML = '<p>Create your first file using the "+ New File" button in the sidebar.</p>';
+        editorContent.contentEditable = "false"; // Disable editing when no file selected
 
     } else {
         editorContent.contentEditable = "true"; // Enable editing
@@ -96,16 +114,16 @@ function loadFiles() {
         const lastFileId = localStorage.getItem('lastOpenFileId');
         let fileToSelect = files.find(f => f.id === lastFileId);
         if (!fileToSelect && files.length > 0) {
-             fileToSelect = files[0]; // Default to first file
+            fileToSelect = files[0]; // Default to first file
         }
 
         if (fileToSelect) {
-             setTimeout(() => selectFile(fileToSelect.id), 0);
+            setTimeout(() => selectFile(fileToSelect.id), 0);
         } else {
             // Handle case where there are files but none could be selected (edge case)
-             pageTitle.textContent = "Select a File";
-             editorContent.innerHTML = '<p>Select a file from the sidebar.</p>';
-             editorContent.contentEditable = "false";
+            pageTitle.textContent = "Select a File";
+            editorContent.innerHTML = '<p>Select a file from the sidebar.</p>';
+            editorContent.contentEditable = "false";
         }
     }
 }
@@ -135,9 +153,8 @@ function createFile() {
         selectFile(fileId); // Select the new file immediately
         startRename(fileElement, fileId); // Start rename process
     });
-     editorContent.contentEditable = "true"; // Ensure editor is editable
+    editorContent.contentEditable = "true"; // Ensure editor is editable
 }
-
 
 // Add file item to the sidebar UI
 function addFileToSidebar(file) {
@@ -159,7 +176,7 @@ function addFileToSidebar(file) {
     // --- Event Listeners for the file item ---
     fileItem.addEventListener('click', (e) => {
         if (e.target.tagName !== 'INPUT') {
-           selectFile(file.id);
+            selectFile(file.id);
         }
     });
 
@@ -177,48 +194,6 @@ function addFileToSidebar(file) {
     return fileItem;
 }
 
-
-// // Select a file
-// function selectFile(fileId) {
-//     console.log("Selecting file:", fileId);
-
-//     // Don't re-select if already selected and editor isn't in initial placeholder state
-//     const isPlaceholder = editorContent.innerHTML.includes('Select a file') || editorContent.innerHTML.includes('No files yet');
-//     if (currentFileId === fileId && !isPlaceholder) return;
-
-//     // If currently renaming, finish it before switching
-//     if (renameInput) {
-//        finishRename();
-//     }
-
-//     currentFileId = fileId;
-//     localStorage.setItem('lastOpenFileId', fileId); // Remember last opened file
-
-//     document.querySelectorAll('.file-item').forEach(item => {
-//         item.classList.toggle('active', item.getAttribute('data-id') === fileId);
-//     });
-
-//     const file = files.find(f => f.id === fileId);
-//     if (file) {
-//         pageTitle.textContent = file.name;
-//         // Set content carefully, avoid adding paragraphs around simple text
-//         editorContent.innerHTML = file.content || ''; // Use empty string instead of <p> for new files
-//         // Add placeholder if content is truly empty after loading
-//         if (editorContent.innerHTML.trim() === '') {
-//              editorContent.innerHTML = '<p>Start typing...</p>';
-//         }
-//         editorContent.contentEditable = "true"; // Ensure editable
-//         editorContent.focus(); // Focus the editor
-//     } else {
-//         console.error("File not found on select:", fileId);
-//         pageTitle.textContent = "Error Loading File";
-//         editorContent.innerHTML = '<p>Could not load file content.</p>';
-//         editorContent.contentEditable = "false";
-//         currentFileId = null;
-//         localStorage.removeItem('lastOpenFileId');
-//     }
-// }
-
 // Save content of the current file
 function saveCurrentFileContent() {
     if (!currentFileId || editorContent.contentEditable !== 'true') return; // No file selected or not editable
@@ -231,9 +206,9 @@ function saveCurrentFileContent() {
         const contentToSave = (currentContent === placeholder) ? '' : currentContent;
 
         if (files[fileIndex].content !== contentToSave) {
-             files[fileIndex].content = contentToSave;
-             saveFiles();
-             console.log("Content saved for file:", currentFileId);
+            files[fileIndex].content = contentToSave;
+            saveFiles();
+            console.log("Content saved for file:", currentFileId);
         }
     } else {
         console.warn("Could not find file to save content for:", currentFileId);
@@ -254,7 +229,7 @@ function setupCanvasEventListeners() {
     // Editor Content Change - Use debounce
     if (editorContent) {
         editorContent.addEventListener('input', debounce(saveCurrentFileContent, 400)); // Save 400ms after input stops
-         // Also save on blur, e.g., when switching tabs
+        // Also save on blur, e.g., when switching tabs
         editorContent.addEventListener('blur', saveCurrentFileContent);
     }
 
@@ -308,71 +283,71 @@ function startRename(fileItemElement, fileId) {
 }
 
 function handleRenameInputEvent(e) {
-     if (!e.target.classList.contains('rename-input')) return;
+    if (!e.target.classList.contains('rename-input')) return;
 
-     if (e.type === 'blur' || (e.type === 'keydown' && e.key === 'Enter')) {
+    if (e.type === 'blur' || (e.type === 'keydown' && e.key === 'Enter')) {
         e.preventDefault();
         finishRename();
     } else if (e.type === 'keydown' && e.key === 'Escape') {
-         e.preventDefault();
+        e.preventDefault();
         cancelRename();
     }
 }
 
 
 function finishRename() {
-     if (!renameInput) return;
+    if (!renameInput) return;
 
-     const fileId = renameInput.getAttribute('data-file-id');
-     let newName = renameInput.value.trim();
-     const fileItemElement = document.getElementById(`file-item-${fileId}`); // Get parent element via ID
-     const fileNameSpan = fileItemElement?.querySelector('.file-name');
+    const fileId = renameInput.getAttribute('data-file-id');
+    let newName = renameInput.value.trim();
+    const fileItemElement = document.getElementById(`file-item-${fileId}`); // Get parent element via ID
+    const fileNameSpan = fileItemElement?.querySelector('.file-name');
 
-     // If name is empty, default to "Untitled"
-     if (!newName) {
-         newName = 'Untitled';
-     }
+    // If name is empty, default to "Untitled"
+    if (!newName) {
+        newName = 'Untitled';
+    }
 
-     renameInput.remove(); // Remove input field first
-     renameInput = null; // Reset tracking variable
+    renameInput.remove(); // Remove input field first
+    renameInput = null; // Reset tracking variable
 
-     if (fileNameSpan) {
-         fileNameSpan.textContent = newName; // Update span text immediately
-         fileNameSpan.style.display = ''; // Show the span again
-         updateFileName(fileId, newName);
-         if (currentFileId === fileId) {
-             pageTitle.textContent = newName; // Update title if current
-         }
-     } else {
-         console.error("Could not find fileNameSpan during finishRename for", fileId);
-     }
- }
+    if (fileNameSpan) {
+        fileNameSpan.textContent = newName; // Update span text immediately
+        fileNameSpan.style.display = ''; // Show the span again
+        updateFileName(fileId, newName);
+        if (currentFileId === fileId) {
+            pageTitle.textContent = newName; // Update title if current
+        }
+    } else {
+        console.error("Could not find fileNameSpan during finishRename for", fileId);
+    }
+}
 
- function cancelRename() {
-      if (!renameInput) return;
+function cancelRename() {
+    if (!renameInput) return;
 
-      const fileId = renameInput.getAttribute('data-file-id');
-      const fileItemElement = document.getElementById(`file-item-${fileId}`);
-      const fileNameSpan = fileItemElement?.querySelector('.file-name');
+    const fileId = renameInput.getAttribute('data-file-id');
+    const fileItemElement = document.getElementById(`file-item-${fileId}`);
+    const fileNameSpan = fileItemElement?.querySelector('.file-name');
 
-      renameInput.remove();
-      renameInput = null;
+    renameInput.remove();
+    renameInput = null;
 
-      if (fileNameSpan) {
-          fileNameSpan.style.display = ''; // Just reveal the original name span
-      }
- }
+    if (fileNameSpan) {
+        fileNameSpan.style.display = ''; // Just reveal the original name span
+    }
+}
 
 function updateFileName(fileId, newName) {
     const fileIndex = files.findIndex(f => f.id === fileId);
     if (fileIndex !== -1) {
         if (files[fileIndex].name !== newName) {
-             files[fileIndex].name = newName;
-             saveFiles();
-             console.log("File renamed:", fileId, "to", newName);
+            files[fileIndex].name = newName;
+            saveFiles();
+            console.log("File renamed:", fileId, "to", newName);
         }
     } else {
-         console.warn("File not found during rename update:", fileId);
+        console.warn("File not found during rename update:", fileId);
     }
 }
 
@@ -404,25 +379,25 @@ function hideContextMenu() {
     if (fileContextMenu && fileContextMenu.style.display === 'block') {
         fileContextMenu.style.display = 'none';
         contextMenuTargetId = null;
-         console.log("Hiding context menu");
+        console.log("Hiding context menu");
     }
 }
 
 function handleContextMenuAction(e) {
     if (!contextMenuTargetId || !e.target.classList.contains('context-menu-item')) {
-         hideContextMenu(); // Hide if clicking outside items
-         return;
-     }
+        hideContextMenu(); // Hide if clicking outside items
+        return;
+    }
 
 
-     const action = e.target.getAttribute('data-action');
-     console.log("Context action:", action, "on", contextMenuTargetId);
-     const targetFileId = contextMenuTargetId; // Store before hiding resets it
-     hideContextMenu(); // Hide menu immediately after click
+    const action = e.target.getAttribute('data-action');
+    console.log("Context action:", action, "on", contextMenuTargetId);
+    const targetFileId = contextMenuTargetId; // Store before hiding resets it
+    hideContextMenu(); // Hide menu immediately after click
 
-     // Need a small delay to ensure the menu is hidden before potential confirmation dialogs
-     setTimeout(() => {
-        switch(action) {
+    // Need a small delay to ensure the menu is hidden before potential confirmation dialogs
+    setTimeout(() => {
+        switch (action) {
             case 'rename':
                 const fileItem = document.getElementById(`file-item-${targetFileId}`);
                 if (fileItem) startRename(fileItem, targetFileId);
@@ -431,12 +406,12 @@ function handleContextMenuAction(e) {
                 const fileToDelete = files.find(f => f.id === targetFileId);
                 const fileName = fileToDelete ? fileToDelete.name : 'this file';
                 if (confirm(`Are you sure you want to delete "${fileName}"? This action cannot be undone.`)) {
-                   deleteFile(targetFileId);
+                    deleteFile(targetFileId);
                 }
                 break;
-         }
-     }, 50); // 50ms delay
- }
+        }
+    }, 50); // 50ms delay
+}
 
 
 // // Delete file
@@ -500,27 +475,126 @@ function toggleSidebar() {
 }
 
 function applySidebarState() {
-     if (!appContainer || !toggleSidebarBtn) return; // Ensure elements exist
+    if (!appContainer || !toggleSidebarBtn) return; // Ensure elements exist
 
-     if (isSidebarCollapsed) {
+    if (isSidebarCollapsed) {
         appContainer.classList.add('sidebar-collapsed');
         toggleSidebarBtn.setAttribute('aria-expanded', 'false');
         toggleSidebarBtn.title = "Show Sidebar";
-         // Update icon to "show" state (e.g., arrows pointing right)
+        // Update icon to "show" state (e.g., arrows pointing right)
         toggleSidebarBtn.innerHTML = `
              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                <polyline points="9 18 15 12 9 6"></polyline>
              </svg>
          `;
-     } else {
+    } else {
         appContainer.classList.remove('sidebar-collapsed');
         toggleSidebarBtn.setAttribute('aria-expanded', 'true');
         toggleSidebarBtn.title = "Hide Sidebar";
-         // Update icon to "hide" state (e.g., arrows pointing left)
+        // Update icon to "hide" state (e.g., arrows pointing left)
         toggleSidebarBtn.innerHTML = `
              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                <polyline points="15 18 9 12 15 6"></polyline>
              </svg>
          `;
-     }
+    }
+}
+
+// Setup AI event listeners
+function setupAIEventListeners() {
+    const summarizeBtn = document.getElementById('summarizeBtn');
+    const modifyBtn = document.getElementById('modifyBtn');
+    const keywordsBtn = document.getElementById('keywordsBtn');
+    const enhanceBtn = document.getElementById('enhanceBtn');
+    const paraphraseBtn = document.getElementById('paraphraseBtn');
+
+    summarizeBtn.addEventListener('click', () => handleAIAction('summarize'));
+    modifyBtn.addEventListener('click', () => handleAIAction('modify'));
+    keywordsBtn.addEventListener('click', () => handleAIAction('keywords'));
+    enhanceBtn.addEventListener('click', () => handleAIAction('enhance'));
+    paraphraseBtn.addEventListener('click', () => handleAIAction('paraphrase'));
+}
+
+// Handle AI actions
+async function handleAIAction(action) {
+    if (!currentFileId) {
+        showNotification('Please select a file first', 'error');
+        return;
+    }
+
+    const file = files.find(f => f.id === currentFileId);
+    if (!file || !file.content) {
+        showNotification('No content to process', 'error');
+        return;
+    }
+
+    try {
+        showLoading(true);
+        const result = await processWithAI(file.content, action);
+        showLoading(false);
+
+        // Create a new file with the AI result
+        const newFileId = 'file_' + Date.now();
+        const newFileName = `${file.name} - ${action.charAt(0).toUpperCase() + action.slice(1)}`;
+        const newFile = {
+            id: newFileId,
+            name: newFileName,
+            content: result
+        };
+
+        files.push(newFile);
+        saveFiles();
+        addFileToSidebar(newFile);
+        selectFile(newFileId);
+    } catch (error) {
+        showLoading(false);
+        showNotification('Error processing with AI: ' + error.message, 'error');
+    }
+}
+
+// Process content with Gemini AI
+async function processWithAI(content, action) {
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+    let prompt = '';
+    switch (action) {
+        case 'summarize':
+            prompt = `Please summarize the following text, focusing on the main concepts and keeping it about 25-30% of the original length:\n\n${content}`;
+            break;
+        case 'modify':
+            prompt = `Please rewrite the following text to be easier to understand, highlighting important parts and concepts for exams:\n\n${content}`;
+            break;
+        case 'keywords':
+            prompt = `Extract the key keywords and important topics from the following text to help a learner remember:\n\n${content}`;
+            break;
+        case 'enhance':
+            prompt = `Enhance the following text by elaborating on key takeaways, concepts missed, and provide deeper explanations to learn better:\n\n${content}`;
+            break;
+        case 'paraphrase':
+            prompt = `Paraphrase the following text in simpler terms while maintaining the original meaning:\n\n${content}`;
+            break;
+    }
+
+    const result = await model.generateContent(prompt);
+    return result.response.text();
+}
+
+// Show loading state
+function showLoading(isLoading) {
+    const buttons = document.querySelectorAll('.ai-tool-btn');
+    buttons.forEach(btn => {
+        btn.disabled = isLoading;
+    });
+}
+
+// Show notification
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
 }
