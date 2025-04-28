@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Updated viewport -->
+  <title>Note Editor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"> <!-- Added Font -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark"> <!-- Ensure body class matches theme if needed -->
+  <!-- Navigation Bar (from index.html structure) -->
+  <header id="navbar" class="navbar fixed-navbar dark-navbar"> <!-- Use fixed-navbar for consistency -->
+      <div class="container"> <!-- Use container for consistent spacing -->
+          <a href="index.html" class="logo"> <!-- Link logo to homepage -->
+              <span class="logo-text">IUT BBC</span>
+          </a>
+          <nav>
+              <ul class="nav-links">
+                  <li id="auth-section">
+                      <!-- Populated by scripts.js -->
+                  </li>
+              </ul>
+          </nav>
+      </div>
+  </header>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <!-- Add Toggle Button Here -->
+        <button id="toggleSidebarBtn" class="toggle-sidebar-btn" title="Hide Sidebar" aria-expanded="true">
+           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+             <polyline points="15 18 9 12 15 6"></polyline>
+           </svg>
+        </button>
+        <button class="add-button" title="Create New File">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14m-7-7h14"/>
+          </svg>
+           New File
+        </button>
+      </div>
+      <div class="sidebar-content" id="sidebarContent">
+          <!-- File items will be added here by JS -->
+      </div>
+       <div class="sidebar-particles" id="sidebarParticles"></div>
+    </div>
+
+    <!-- Editor -->
+    <div class="editor">
+      <h1 id="pageTitle" class="editor-page-title">Select or Create a File</h1> <!-- Updated initial title -->
+      <div>
+        <div >
+          <div contenteditable="true">
+            <!-- STAR 
+            FROM 
+            TABIB
+            MUHAIMIN
+            HELLOOOO
+
+            SDBVHYUIA 
+            abwhu lviblzm
+            HERE -->
+            <form id="form">
+                <label for="textInput"></label>
+                <textarea id="textInput" name="textInput" placeholder="Enter text…"></textarea>
+                <div class="file-row">
+                    <label for="fileInput">Or select a PDF/Image:</label>
+                    <input type="file" id="fileInput" accept=".pdf,image/*" />
+                </div>
+            </form>
+              <!-- Content loaded by JS -->
+              <!-- <p>Select a file from the left sidebar or create a new one to start writing.</p> -->
+          </div>
+          <ul id="responses"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <!-- Consider if these toolbar buttons are still relevant for document editing -->
+        <!-- If keeping, style them according to the theme -->
+      <button class="toolbar-button" title="Chat (Functionality TBD)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </button>
+      <button class="toolbar-button" title="Modify (Functionality TBD)" id="mod">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 4V2m0 2v2m0-2h-4m8 2a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h1zm-8.5 9.5L9 18l4.5-4.5"/>
+        </svg>
+      </button>
+      <button class="toolbar-button" title="Quiz (Functionality TBD)" id="key">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <path d="M12 16v-4m0 0v-4m0 4h4m-4 0H8"/>
+        </svg>
+      </button>
+      <button class="toolbar-button" title="Export PDF (Functionality TBD)" id="enh">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <path d="M14 2v6h6"/>
+        </svg>
+      </button>
+       <button class="toolbar-button" title="Settings" id="sum"> <!-- Kept settings as it might be useful -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
+  <!-- Profile Dropdown (from index.html) -->
+  <div id="profileDropdown" class="profile-dropdown">
+      <a href="profile.html" class="dropdown-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          Settings
+      </a>
+      <a href="#" id="logoutBtn" class="dropdown-item"> <!-- Ensure logoutBtn ID is present for scripts.js -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          Logout
+      </a>
+  </div>
+
+  <!-- Context Menu (Hidden by default) -->
+  <div id="fileContextMenu" class="context-menu">
+    <div class="context-menu-item" data-action="rename">Rename</div>
+    <div class="context-menu-item" data-action="delete">Delete</div>
+  </div>
+
+  <!-- PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.js"></script>
+  <!-- Tesseract.js -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+
+  <script src="scripts.js"></script>
+  <script src="canvas.js"></script>
+  <script type="module">
+    import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+    const apiKey = "AIzaSyBs381LGOePP1TSoZOEDAGAiLm11ypsInU";
+    const genAI = new GoogleGenerativeAI(apiKey);
+
+    const form = document.querySelector('#aiForm');
+    const textInput = document.querySelector('#textInput');
+    const fileInput = document.querySelector('#fileInput');
+    const responsesList = document.querySelector('#responses');
+
+    let extractedText = '';
+
+    async function callGemini(promptText) {
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const result = await model.generateContent(promptText);
+      return result.response.text();
+    }
+
+    async function extractTextFromPDF(file) {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let text = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        text += content.items.map(item => item.str).join(' ') + '\n';
+      }
+      return text;
+    }
+
+    async function extractTextFromImage(file) {
+      const { data: { text } } = await Tesseract.recognize(file, 'eng');
+      return text;
+    }
+
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      extractedText = '';
+      addResponse('Info', 'Hold up...');
+      if (file.type === 'application/pdf') {
+        extractedText = await extractTextFromPDF(file);
+      } else if (file.type.startsWith('image/')) {
+        extractedText = await extractTextFromImage(file);
+      }
+      addResponse('Info', 'All good, select an action please');
+    });
+
+    function getInputText() {
+      const txt = textInput.value.trim();
+      return txt || extractedText;
+    }
+
+    function addResponse(title, content) {
+      const li = document.createElement('li');
+      const h2 = document.createElement('h2');
+      h2.textContent = title;
+      const p = document.createElement('div');
+      p.textContent = content;
+      li.append(h2, p);
+      responsesList.prepend(li);
+    }
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const text = getInputText();
+      if (!text){
+       return addResponse('Error', 'Please enter text or select a file.');}
+      addResponse('Summarize', '…thinking…');
+      const summary = await callGemini(`Please summarize the following text, the summary should grasp the main concepts and be about 25 to 30% in size of the original content:\n\n${text}`);
+      responsesList.querySelector('li:first-child div').textContent = summary;
+    });
+
+    document.querySelector('#mod').addEventListener('click', async () => {
+      const text = getInputText();
+      if (!text) return addResponse('Error', 'Please enter text or select a file.');
+      addResponse('Modify', '…thinking…');
+      const mod = await callGemini(`Please rewrite the following text to be easier to understand and highlight the important parts and concepts for exams:\n\n${text}`);
+      responsesList.querySelector('li:first-child div').textContent = mod;
+    });
+
+    document.querySelector('#key').addEventListener('click', async () => {
+      const text = getInputText();
+      if (!text) return addResponse('Error', 'Please enter text or select a file.');
+      addResponse('Keywords', '…thinking…');
+      const keys = await callGemini(`Extract the key keywords and important topics from the following text to help a learner remember:\n\n${text}`);
+      responsesList.querySelector('li:first-child div').textContent = keys;
+    });
+
+    document.querySelector('#enh').addEventListener('click', async () => {
+      const text = getInputText();
+      if (!text) return addResponse('Error', 'Please enter text or select a file.');
+      addResponse('Enhancement', '…thinking…');
+      const enh = await callGemini(`Enhance the following text by elaborating on key takeaways, concepts missed, and provide deeper explanations to learn better:\n\n${text}`);
+      responsesList.querySelector('li:first-child div').textContent = enh;
+    });
+  </script>
+</body>
+</html>
