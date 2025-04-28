@@ -6,7 +6,7 @@ _Unlock your learning potential with Naksha Note._
 
 ---
 
-## 📖 Overview
+# Overview
 
 Naksha Note is a streamlined web application designed to elevate your study workflow by transforming raw notes into refined learning assets. Leveraging advanced AI modules, the app enables you to:
 
