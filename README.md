@@ -20,7 +20,7 @@ Focus on learning—let Naksha Note handle the formatting and refinement.
 
 ---
 
-## 🚀 Key Features
+# Key Features
 
 | Feature           | Description                                           |
 |-------------------|-------------------------------------------------------|
@@ -34,7 +34,7 @@ Focus on learning—let Naksha Note handle the formatting and refinement.
 ---
 
 
-## 🎓 Usage
+# Usage
 
 1. Paste or upload your raw notes into the editor.
 2. Choose an AI tool: Summary, Paraphrase, Keywords, or Enhance.
@@ -43,7 +43,7 @@ Focus on learning—let Naksha Note handle the formatting and refinement.
 
 ---
 
-## 🤝 Contributors
+# Contributors
 
 - Nafian-23
 - ZoldyckX
