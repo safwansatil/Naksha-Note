@@ -1,115 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Updated viewport -->
-  <title>Note Editor</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"> <!-- Added Font -->
+  <title>Tabib - Note Taking App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Added Font -->
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@google/generative-ai"></script>
 </head>
+
 <body class="dark"> <!-- Ensure body class matches theme if needed -->
-  <!-- Navigation Bar (from index.html structure) -->
-  <header id="navbar" class="navbar fixed-navbar dark-navbar"> <!-- Use fixed-navbar for consistency -->
-      <div class="container"> <!-- Use container for consistent spacing -->
-          <a href="index.html" class="logo"> <!-- Link logo to homepage -->
-              <span class="logo-text">IUT BBC</span>
-          </a>
-          <nav>
-              <ul class="nav-links">
-                  <li id="auth-section">
-                      <!-- Populated by scripts.js -->
-                  </li>
-              </ul>
-          </nav>
-      </div>
+  <!-- Navigation Bar -->
+  <header id="navbar" class="navbar fixed-navbar">
+    <div class="container">
+      <a href="index.html" class="logo">
+        <span class="logo-text">IUT BBC</span>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li>
+            <button id="themeToggle" class="theme-toggle" title="Toggle Dark Mode">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            </button>
+          </li>
+          <li>
+            <button id="settingsBtn" class="settings-btn" title="Settings">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                </path>
+              </svg>
+            </button>
+          </li>
+          <li id="auth-section">
+            <!-- Populated by scripts.js -->
+          </li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
   <div class="app-container">
-    <!-- Sidebar -->
-    <div class="sidebar">
+    <!-- Files Sidebar -->
+    <div class="files-sidebar">
       <div class="sidebar-header">
-        <!-- Add Toggle Button Here -->
-        <button id="toggleSidebarBtn" class="toggle-sidebar-btn" title="Hide Sidebar" aria-expanded="true">
-           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-             <polyline points="15 18 9 12 15 6"></polyline>
-           </svg>
-        </button>
-        <button class="add-button" title="Create New File">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 5v14m-7-7h14"/>
+        <h3>My Notes</h3>
+        <button id="newFileBtn" class="new-file-btn">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
           </svg>
-           New File
+          New Note
         </button>
       </div>
-      <div class="sidebar-content" id="sidebarContent">
-          <!-- File items will be added here by JS -->
+      <div class="files-list">
+        <!-- Files will be added here dynamically -->
       </div>
-       <div class="sidebar-particles" id="sidebarParticles"></div>
     </div>
 
     <!-- Editor -->
     <div class="editor">
-      <h1 id="pageTitle" class="editor-page-title">Select or Create a File</h1> <!-- Updated initial title -->
-      <div>
-        <div >
-          <div contenteditable="true">
-            <!-- STAR 
-            FROM 
-            TABIB
-            MUHAIMIN
-            HELLOOOO
+      <h1 id="pageTitle" class="editor-page-title">Select or Create a Note</h1>
+      <div class="editor-content">
+        <div class="input-section">
+          <form id="aiForm">
+            <div class="input-group">
+              <label for="textInput">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 20h9"></path>
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                </svg>
+                Enter your text
+              </label>
+              <textarea id="textInput" name="textInput" placeholder="Type or paste your text here..."></textarea>
+            </div>
 
-            SDBVHYUIA 
-            abwhu lviblzm
-            HERE -->
-            <form id="form">
-                <label for="textInput"></label>
-                <textarea id="textInput" name="textInput" placeholder="Enter text…"></textarea>
-                <div class="file-row">
-                    <label for="fileInput">Or select a PDF/Image:</label>
-                    <input type="file" id="fileInput" accept=".pdf,image/*" />
-                </div>
-            </form>
-              <!-- Content loaded by JS -->
-              <!-- <p>Select a file from the left sidebar or create a new one to start writing.</p> -->
-          </div>
+            <div class="file-row">
+              <label for="fileInput">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                Upload PDF or Image
+              </label>
+              <input type="file" id="fileInput" accept=".pdf,image/*" />
+              <div class="file-info" id="fileInfo"></div>
+            </div>
+
+            <div class="buttons">
+              <button type="submit" id="sum">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Summarize
+              </button>
+              <button type="button" id="mod">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                </svg>
+                Modify
+              </button>
+              <button type="button" id="key">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                  <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                </svg>
+                Keywords
+              </button>
+              <button type="button" id="enh">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+                </svg>
+                Enhance
+              </button>
+              <button type="button" id="par">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                Paraphrase
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="response-section">
+          <h2>AI Responses</h2>
           <ul id="responses"></ul>
         </div>
       </div>
-    </div>
-
-    <!-- Toolbar -->
-    <div class="toolbar">
-        <!-- Consider if these toolbar buttons are still relevant for document editing -->
-        <!-- If keeping, style them according to the theme -->
-      <button class="toolbar-button" title="Chat (Functionality TBD)">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-        </svg>
-      </button>
-      <button class="toolbar-button" title="Modify (Functionality TBD)" id="mod">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M15 4V2m0 2v2m0-2h-4m8 2a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h1zm-8.5 9.5L9 18l4.5-4.5"/>
-        </svg>
-      </button>
-      <button class="toolbar-button" title="Quiz (Functionality TBD)" id="key">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-          <path d="M12 16v-4m0 0v-4m0 4h4m-4 0H8"/>
-        </svg>
-      </button>
-      <button class="toolbar-button" title="Export PDF (Functionality TBD)" id="enh">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-          <path d="M14 2v6h6"/>
-        </svg>
-      </button>
-       <button class="toolbar-button" title="Settings" id="sum"> <!-- Kept settings as it might be useful -->
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
-        </svg>
-      </button>
     </div>
   </div>
 
@@ -118,14 +165,23 @@
 
   <!-- Profile Dropdown (from index.html) -->
   <div id="profileDropdown" class="profile-dropdown">
-      <a href="profile.html" class="dropdown-item">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-          Settings
-      </a>
-      <a href="#" id="logoutBtn" class="dropdown-item"> <!-- Ensure logoutBtn ID is present for scripts.js -->
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-          Logout
-      </a>
+    <a href="profile.html" class="dropdown-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+      Settings
+    </a>
+    <a href="#" id="logoutBtn" class="dropdown-item"> <!-- Ensure logoutBtn ID is present for scripts.js -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+      Logout
+    </a>
   </div>
 
   <!-- Context Menu (Hidden by default) -->
@@ -141,6 +197,7 @@
 
   <script src="scripts.js"></script>
   <script src="canvas.js"></script>
+  <script src="theme.js"></script>
   <script type="module">
     import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
     const apiKey = "AIzaSyBs381LGOePP1TSoZOEDAGAiLm11ypsInU";
@@ -150,8 +207,158 @@
     const textInput = document.querySelector('#textInput');
     const fileInput = document.querySelector('#fileInput');
     const responsesList = document.querySelector('#responses');
-
+    const pageTitle = document.querySelector('#pageTitle');
     let extractedText = '';
+
+    // Store files data
+    const filesData = new Map();
+    let currentFileId = 1;
+
+    // Create a new file
+    function createNewFile() {
+      const fileId = `file-${currentFileId++}`;
+      const fileName = `Untitled-${currentFileId - 1}`;
+
+      const fileItem = document.createElement('div');
+      fileItem.className = 'file-item';
+      fileItem.dataset.fileId = fileId;
+      fileItem.innerHTML = `
+        <div class="file-name" contenteditable="true">${fileName}</div>
+        <div class="file-actions">
+          <button class="rename-file-btn" title="Rename file">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11.5 3.5L10.5 4.5M2.5 12.5L3.5 11.5M10.5 4.5L9.5 3.5M10.5 4.5L11.5 5.5M3.5 11.5L4.5 10.5M3.5 11.5L2.5 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <button class="delete-file-btn" title="Delete file">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10.5 3.5L3.5 10.5M3.5 3.5L10.5 10.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      `;
+
+      filesList.appendChild(fileItem);
+      activateFile(fileId);
+
+      // Store file data
+      filesData.set(fileId, {
+        name: fileName,
+        text: '',
+        responses: []
+      });
+
+      // Clear the input and responses for the new file
+      textInput.value = '';
+      responsesList.innerHTML = '';
+
+      // Add event listeners
+      fileItem.addEventListener('click', () => activateFile(fileId));
+
+      // Rename button click handler
+      const renameBtn = fileItem.querySelector('.rename-file-btn');
+      renameBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const nameElement = fileItem.querySelector('.file-name');
+        nameElement.focus();
+        // Select all text
+        const range = document.createRange();
+        range.selectNodeContents(nameElement);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+      });
+
+      // Handle file name editing
+      const nameElement = fileItem.querySelector('.file-name');
+      nameElement.addEventListener('blur', () => {
+        const newName = nameElement.textContent.trim();
+        if (newName) {
+          filesData.get(fileId).name = newName;
+          pageTitle.textContent = newName;
+        } else {
+          nameElement.textContent = filesData.get(fileId).name;
+        }
+      });
+
+      // Handle Enter key in editable name
+      nameElement.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          nameElement.blur();
+        }
+      });
+
+      // Delete button click handler
+      const deleteBtn = fileItem.querySelector('.delete-file-btn');
+      deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (confirm('Are you sure you want to delete this note?')) {
+          deleteFile(fileId);
+        }
+      });
+    }
+
+    // Activate a file
+    function activateFile(fileId) {
+      document.querySelectorAll('.file-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      document.querySelector(`[data-file-id="${fileId}"]`).classList.add('active');
+
+      // Update page title
+      const fileName = filesData.get(fileId).name;
+      pageTitle.textContent = fileName;
+
+      // Load file data
+      const fileData = filesData.get(fileId);
+      textInput.value = fileData.text;
+      responsesList.innerHTML = '';
+      fileData.responses.forEach(response => {
+        const li = document.createElement('li');
+        li.setAttribute('data-type', response.type);
+        const h2 = document.createElement('h2');
+        h2.textContent = response.title;
+        const p = document.createElement('div');
+        p.textContent = response.content;
+        li.append(h2, p);
+        responsesList.appendChild(li);
+      });
+    }
+
+    // Delete a file
+    function deleteFile(fileId) {
+      const fileItem = document.querySelector(`[data-file-id="${fileId}"]`);
+      if (fileItem) {
+        fileItem.remove();
+        filesData.delete(fileId);
+
+        // If this was the active file, activate the first available file or create a new one
+        if (fileItem.classList.contains('active')) {
+          const nextFile = document.querySelector('.file-item');
+          if (nextFile) {
+            activateFile(nextFile.dataset.fileId);
+          } else {
+            createNewFile();
+          }
+        }
+      }
+    }
+
+    // Save current file data
+    function saveCurrentFile() {
+      const activeFile = document.querySelector('.file-item.active');
+      if (activeFile) {
+        const fileId = activeFile.dataset.fileId;
+        const fileData = filesData.get(fileId);
+        fileData.text = textInput.value;
+        fileData.responses = Array.from(responsesList.children).map(li => ({
+          title: li.querySelector('h2').textContent,
+          content: li.querySelector('div').textContent,
+          type: li.dataset.type
+        }));
+      }
+    }
 
     async function callGemini(promptText) {
       const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
@@ -176,6 +383,23 @@
       return text;
     }
 
+    function getInputText() {
+      const txt = textInput.value.trim();
+      return txt || extractedText;
+    }
+
+    function addResponse(title, content, type = 'info') {
+      const li = document.createElement('li');
+      li.setAttribute('data-type', type);
+      const h2 = document.createElement('h2');
+      h2.textContent = title;
+      const p = document.createElement('div');
+      p.textContent = content;
+      li.append(h2, p);
+      responsesList.prepend(li);
+    }
+
+    // Update file input handling
     fileInput.addEventListener('change', async () => {
       const file = fileInput.files[0];
       if (!file) return;
@@ -187,56 +411,90 @@
         extractedText = await extractTextFromImage(file);
       }
       addResponse('Info', 'All good, select an action please');
+
+      // Save the extracted text to current file
+      const activeFile = document.querySelector('.file-item.active');
+      if (activeFile) {
+        const fileId = activeFile.dataset.fileId;
+        filesData.get(fileId).text = extractedText;
+        textInput.value = extractedText;
+      }
     });
 
-    function getInputText() {
-      const txt = textInput.value.trim();
-      return txt || extractedText;
-    }
-
-    function addResponse(title, content) {
-      const li = document.createElement('li');
-      const h2 = document.createElement('h2');
-      h2.textContent = title;
-      const p = document.createElement('div');
-      p.textContent = content;
-      li.append(h2, p);
-      responsesList.prepend(li);
-    }
-
+    // Update form submission to save responses
     form.addEventListener('submit', async e => {
       e.preventDefault();
       const text = getInputText();
-      if (!text){
-       return addResponse('Error', 'Please enter text or select a file.');}
-      addResponse('Summarize', '…thinking…');
+      if (!text) {
+        return addResponse('Error', 'Please enter text or select a file.', 'error');
+      }
+      addResponse('Summarize', '…thinking…', 'summarize');
       const summary = await callGemini(`Please summarize the following text, the summary should grasp the main concepts and be about 25 to 30% in size of the original content:\n\n${text}`);
       responsesList.querySelector('li:first-child div').textContent = summary;
+      saveCurrentFile();
     });
 
+    // Update button click handlers to save responses
     document.querySelector('#mod').addEventListener('click', async () => {
       const text = getInputText();
-      if (!text) return addResponse('Error', 'Please enter text or select a file.');
-      addResponse('Modify', '…thinking…');
+      if (!text) return addResponse('Error', 'Please enter text or select a file.', 'error');
+      addResponse('Modify', '…thinking…', 'modify');
       const mod = await callGemini(`Please rewrite the following text to be easier to understand and highlight the important parts and concepts for exams:\n\n${text}`);
       responsesList.querySelector('li:first-child div').textContent = mod;
+      saveCurrentFile();
     });
 
     document.querySelector('#key').addEventListener('click', async () => {
       const text = getInputText();
-      if (!text) return addResponse('Error', 'Please enter text or select a file.');
-      addResponse('Keywords', '…thinking…');
+      if (!text) return addResponse('Error', 'Please enter text or select a file.', 'error');
+      addResponse('Keywords', '…thinking…', 'keywords');
       const keys = await callGemini(`Extract the key keywords and important topics from the following text to help a learner remember:\n\n${text}`);
       responsesList.querySelector('li:first-child div').textContent = keys;
+      saveCurrentFile();
     });
 
     document.querySelector('#enh').addEventListener('click', async () => {
       const text = getInputText();
-      if (!text) return addResponse('Error', 'Please enter text or select a file.');
-      addResponse('Enhancement', '…thinking…');
+      if (!text) return addResponse('Error', 'Please enter text or select a file.', 'error');
+      addResponse('Enhancement', '…thinking…', 'enhance');
       const enh = await callGemini(`Enhance the following text by elaborating on key takeaways, concepts missed, and provide deeper explanations to learn better:\n\n${text}`);
       responsesList.querySelector('li:first-child div').textContent = enh;
+      saveCurrentFile();
     });
+
+    document.querySelector('#par').addEventListener('click', async () => {
+      const text = getInputText();
+      if (!text) return addResponse('Error', 'Please enter text or select a file.', 'error');
+      addResponse('Paraphrase', '…thinking…', 'paraphrase');
+      const par = await callGemini(`Paraphrase the following text in simpler terms while maintaining the original meaning:\n\n${text}`);
+      responsesList.querySelector('li:first-child div').textContent = par;
+      saveCurrentFile();
+    });
+
+    // Settings Button Functionality
+    const settingsBtn = document.getElementById('settingsBtn');
+    const profileDropdown = document.getElementById('profileDropdown');
+
+    settingsBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      profileDropdown.classList.toggle('active');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', () => {
+      profileDropdown.classList.remove('active');
+    });
+
+    // File management functionality
+    const filesList = document.querySelector('.files-list');
+    const newFileBtn = document.getElementById('newFileBtn');
+
+    // Event listeners
+    newFileBtn.addEventListener('click', createNewFile);
+
+    // Initialize
+    createNewFile();
   </script>
 </body>
+
 </html>
