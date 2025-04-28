@@ -1,134 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <title>Note Editor</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Naksha Notes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- fonts -->
+  <link rel="stylesheet" href="styles.css"> <!-- styles.css given in the repo-->
 </head>
+
 <body>
-  <h1>Welcome!!</h1>
-  <form id="aiForm">
-    <label for="textInput">Enter text:</label>
-    <textarea id="textInput" name="textInput" placeholder="Enter text…"></textarea>
-
-    <div class="file-row">
-      <label for="fileInput">Or select a PDF/Image:</label>
-      <input type="file" id="fileInput" accept=".pdf,image/*" />
+  <!-- Navigation Bar -->
+  <header id="navbar" class="navbar fixed-navbar">
+    <div class="container">
+      <a href="index.html" class="logo"> <!-- Click to go back to home page -->
+        <span class="logo-text">Naksha Notes</span>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li>
+            <button id="themeToggle" class="theme-toggle" title="Toggle Dark Mode">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            </button>
+          </li>
+          <li>
+            <button id="settingsBtn" class="settings-btn" title="Settings">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                </path>
+              </svg>
+            </button>
+          </li>
+          <li id="auth-section">
+            <!-- Will be populated by JS -->
+          </li>
+        </ul>
+      </nav>
     </div>
+  </header>
 
-    <div class="buttons">
-      <button type="submit" id="sum">Summarize</button>
-      <button type="button" id="mod">Modify</button>
-      <button type="button" id="key">Keywords</button>
-      <button type="button" id="enh">Enhancement</button>
-      <!-- <button type="button" id="flash">FlashCards?</button> -->
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="particles-container" id="particles"></div>
+    <div class="container">
+      <div class="moving-character">
+        <div class="character"></div>
+      </div>
+      <h1 class="hero-title">
+        <span class="text-gradient">Your Notes Enhancer</span>
+        <br>
+        <span>is here for you</span>
+      </h1>
+      <div class="dynamic-text-container">
+        <div id="dynamic-text" class="dynamic-text"></div>
+      </div>
+      <button id="enter-canvas-btn" class="btn-primary">Enter into the Canvas</button>
+      <div class="scroll-indicator">
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 5v14M19 12l-7 7-7-7" />
+        </svg>
+      </div>
     </div>
-  </form>
+  </section>
 
-  <ul id="responses"></ul>
+  <!-- About Us Section -->
+  <section class="about-us" id="about">
+    <div class="container">
+      <h2 class="section-title">About Us</h2>
+      <div class="about-content">
+        <div class="about-text">
+          <p>we're revolutionizing the way students approach learning and note-taking. Our AI-powered platform enhances
+            your study materials, turning ordinary notes into comprehensive learning resources.</p>
+          <p>Founded in 2025, our team of education specialists, developers, and AI experts from IUT have been working
+            to create tools that make studying more efficient and effective. We believe that technology should serve
+            education, not replace the human element of learning.</p>
+          <p>Our mission is to empower students worldwide by providing accessible, intelligent tools that adapt to
+            individual learning styles and needs. Join us on this journey to transform education and unlock your full
+            potential.</p>
+        </div>
+      </div>
+      <div class="team-section">
+        <h3>Our Team</h3>
+        <div class="team-members">
+          <div class="team-member">
+            <div class="member-avatar"><img src="tabib.jpg" height="120" width="120" border-radius="50%" alt="tabib's Avatar"></div>
+            <h4>Tabib Hassan</h4>
+            <p></p>
+          </div>
+          <div class="team-member">
+            <div class="member-avatar"><img src="mahim.jpg" height="120" width="120" border-radius="50%" alt="Mahim's Avatar"></div>
+            <h4>Muhaiminul Hasan</h4>
+            <p></p>
+          </div>
+          <div class="team-member">
+            <div class="member-avatar"><img src="wasiv2.jpg" height="120" width="120" border-radius="50%" alt="omar's Avatar"></div>
+            <h4>Wasi Omar Syed</h4>
+            <p></p>
+          </div>
+          <div class="team-member">
+            <div class="member-avatar"><img src="sf1.jpg" height="120" width="120" border-radius="50%" alt="safwansatil's Avatar"></div>
+            <h4>safwansatil</h4>
+            <p></p>
+          </div>
+          <div class="team-member">
+            <div class="member-avatar"><img src="mahid.jpg" height="120" width="120" border-radius="50%" alt="Mahid's Avatar"></div>
+            <h4>Nafian Nazhat Mahid</h4>
+            <p></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <!-- PDF.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.js"></script>
-  <!-- Tesseract.js -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+  <!-- Contact Us Section -->
+  <section class="contact-us" id="contact">
+    <div class="container">
+      <h2 class="section-title">Contact Us</h2>
+      <div class="contact-content">
+        <form class="contact-form" id="contactForm">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" placeholder="Your Name">
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="Your Email">
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" placeholder="Your Message"></textarea>
+          </div>
+          <button type="submit" class="btn-primary" id="contactBtn__">Send Message</button>
+        </form>
+        <div class="contact-info">
+          <div class="info-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="4" width="20" height="16" rx="2" />
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+            </svg>
+            <p>safwanhassan@iut-dhaka.edu</p>
+          </div>
+          <div class="info-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+            </svg>
+            <p>+880 175 343 8108</p>
+          </div>
+          <div class="info-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <p>Islamic University of Technology<br>Gazipur, Bangladesh</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <script type="module">
-    import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
-    const apiKey = "AIzaSyBs381LGOePP1TSoZOEDAGAiLm11ypsInU";
-    const genAI = new GoogleGenerativeAI(apiKey);
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <h3 class="footer-logo">NakshaNotes</h3>
+      <p class="footer-tagline">Enhancing the way you learn, one note at a time.</p>
+      <div class="social-links">
+        <a href="#" class="social-link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+            <path
+              d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z" />
+          </svg>
+        </a>
+        <a href="#" class="social-link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+            <path
+              d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z" />
+          </svg>
+        </a>
+        <a href="#" class="social-link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+            <path
+              d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z" />
+          </svg>
+        </a>
+      </div>
+      <p class="copyright">&copy; <span id="year"></span>nakshaNotes. All rights reserved.</p>
+    </div>
+  </footer>
 
-    const form = document.querySelector('#aiForm');
-    const textInput = document.querySelector('#textInput');
-    const fileInput = document.querySelector('#fileInput');
-    const responsesList = document.querySelector('#responses');
+  <!-- User Profile Dropdown (Hidden by default) -->
+  <div id="profileDropdown" class="profile-dropdown">
+    <a href="profile.html" class="dropdown-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+      Settings
+    </a>
+    <a href="#" id="logoutBtn" class="dropdown-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+      Logout
+    </a>
+  </div>
 
-    let extractedText = '';
+  <!-- Toast Notifications -->
+  <div id="toast" class="toast"></div>
 
-    async function callGemini(promptText) {
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-      const result = await model.generateContent(promptText);
-      return result.response.text();
-    }
-
-    async function extractTextFromPDF(file) {
-      const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-      let text = '';
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const content = await page.getTextContent();
-        text += content.items.map(item => item.str).join(' ') + '\n';
-      }
-      return text;
-    }
-
-    async function extractTextFromImage(file) {
-      const { data: { text } } = await Tesseract.recognize(file, 'eng');
-      return text;
-    }
-
-    fileInput.addEventListener('change', async () => {
-      const file = fileInput.files[0];
-      if (!file) return;
-      extractedText = '';
-      addResponse('Info', 'Hold up...');
-      if (file.type === 'application/pdf') {
-        extractedText = await extractTextFromPDF(file);
-      } else if (file.type.startsWith('image/')) {
-        extractedText = await extractTextFromImage(file);
-      }
-      addResponse('Info', 'All good, select an action please');
-    });
-
-    function getInputText() {
-      const txt = textInput.value.trim();
-      return txt || extractedText;
-    }
-
-    function addResponse(title, content) {
-      const li = document.createElement('li');
-      const h2 = document.createElement('h2');
-      h2.textContent = title;
-      const p = document.createElement('div');
-      p.textContent = content;
-      li.append(h2, p);
-      responsesList.prepend(li);
-    }
-
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      const text = getInputText();
-      if (!text){
-       return addResponse('Error', 'Please enter text or select a file.');}
-      addResponse('Summarize', '…thinking…');
-      const summary = await callGemini(`Please summarize the following text, the summary should grasp the main concepts and be about 25 to 30% in size of the original content:\n\n${text}`);
-      responsesList.querySelector('li:first-child div').textContent = summary;
-    });
-
-    document.querySelector('#mod').addEventListener('click', async () => {
-      const text = getInputText();
-      if (!text) return addResponse('Error', 'Please enter text or select a file.');
-      addResponse('Modify', '…thinking…');
-      const mod = await callGemini(`Please rewrite the following text to be easier to understand and highlight the important parts and concepts for exams:\n\n${text}`);
-      responsesList.querySelector('li:first-child div').textContent = mod;
-    });
-
-    document.querySelector('#key').addEventListener('click', async () => {
-      const text = getInputText();
-      if (!text) return addResponse('Error', 'Please enter text or select a file.');
-      addResponse('Keywords', '…thinking…');
-      const keys = await callGemini(`Extract the key keywords and important topics from the following text to help a learner remember:\n\n${text}`);
-      responsesList.querySelector('li:first-child div').textContent = keys;
-    });
-
-    document.querySelector('#enh').addEventListener('click', async () => {
-      const text = getInputText();
-      if (!text) return addResponse('Error', 'Please enter text or select a file.');
-      addResponse('Enhancement', '…thinking…');
-      const enh = await callGemini(`Enhance the following text by elaborating on key takeaways, concepts missed, and provide deeper explanations to learn better:\n\n${text}`);
-      responsesList.querySelector('li:first-child div').textContent = enh;
-    });
-  </script>
-
+  <script src="scripts.js"></script>
+  <script src="theme.js"></script>
 </body>
+
 </html>
