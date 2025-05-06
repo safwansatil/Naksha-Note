@@ -31,8 +31,8 @@ let contextMenuTargetId = null;
 let renameInput = null;
 let isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
 
-// Gemini API Configuration
-const apiKey = "YOUR_GEMINI_API_KEY"; // Replace with your actual API key
+
+const apiKey = "YOUR_GEMINI_API_KEY"; 
 const genAI = new GoogleGenerativeAI(apiKey);
 
 // Initialize the application
@@ -58,18 +58,18 @@ function initSidebarParticles() {
     console.log("Initializing sidebar particles");
     if (!sidebarParticles) return;
 
-    sidebarParticles.innerHTML = ''; // Clear existing
-    const particleCount = 15; // Adjust density
+    sidebarParticles.innerHTML = ''; 
+    const particleCount = 15; 
 
     for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement('div');
-        particle.classList.add('sidebar-particle'); // Use the CSS class for styling
+        particle.classList.add('sidebar-particle'); 
 
-        const size = Math.random() * 5 + 2; // Smaller particles
+        const size = Math.random() * 5 + 2; 
         particle.style.width = `${size}px`;
         particle.style.height = `${size}px`;
-        particle.style.position = 'absolute'; // Ensure positioning works
-        particle.style.backgroundColor = 'var(--theme-green)'; // Use theme color
+        particle.style.position = 'absolute'; 
+        particle.style.backgroundColor = 'var(--theme-green)'; 
         particle.style.borderRadius = '50%';
 
         // Random position within the sidebar
@@ -77,7 +77,7 @@ function initSidebarParticles() {
         particle.style.left = `${Math.random() * 100}%`;
 
         // Random animation properties
-        particle.style.opacity = Math.random() * 0.4 + 0.1; // Subtle opacity
+        particle.style.opacity = Math.random() * 0.4 + 0.1; 
         particle.style.animationDuration = `${Math.random() * 8 + 5}s`;
         particle.style.animationDelay = `${Math.random() * 5}s`;
 
@@ -88,29 +88,29 @@ function initSidebarParticles() {
 // Load files from local storage
 function loadFiles() {
     const storedFiles = localStorage.getItem('files');
-    // Basic error handling for potentially corrupt JSON
+    
     try {
         files = storedFiles ? JSON.parse(storedFiles) : [];
-        if (!Array.isArray(files)) { // Ensure it's an array
+        if (!Array.isArray(files)) {
             files = [];
         }
     } catch (error) {
         console.error("Error parsing files from localStorage:", error);
-        files = []; // Reset to empty array on error
-        localStorage.removeItem('files'); // Clear corrupted data
+        files = []; 
+        localStorage.removeItem('files'); 
     }
     console.log("Loading files:", files);
 
-    sidebarContent.innerHTML = ''; // Clear existing items
+    sidebarContent.innerHTML = ''; 
     if (files.length === 0) {
         pageTitle.textContent = "No files yet";
         editorContent.innerHTML = '<p>Create your first file using the "+ New File" button in the sidebar.</p>';
-        editorContent.contentEditable = "false"; // Disable editing when no file selected
+        editorContent.contentEditable = "false"; 
 
     } else {
-        editorContent.contentEditable = "true"; // Enable editing
+        editorContent.contentEditable = "true";
         files.forEach(addFileToSidebar);
-        // Attempt to reselect the last opened file, otherwise select the first
+        
         const lastFileId = localStorage.getItem('lastOpenFileId');
         let fileToSelect = files.find(f => f.id === lastFileId);
         if (!fileToSelect && files.length > 0) {
@@ -120,7 +120,7 @@ function loadFiles() {
         if (fileToSelect) {
             setTimeout(() => selectFile(fileToSelect.id), 0);
         } else {
-            // Handle case where there are files but none could be selected (edge case)
+            
             pageTitle.textContent = "Select a File";
             editorContent.innerHTML = '<p>Select a file from the sidebar.</p>';
             editorContent.contentEditable = "false";
@@ -131,7 +131,7 @@ function loadFiles() {
 // Create a new file
 function createFile() {
     console.log("Creating new file triggered");
-    // Finish any rename operation before creating a new file
+    
     if (renameInput) {
         finishRename();
     }
@@ -141,19 +141,19 @@ function createFile() {
     const newFile = {
         id: fileId,
         name: defaultName,
-        content: '' // Start with empty content
+        content: '' 
     };
 
-    files.push(newFile); // Add to the end (or use unshift to add to start)
+    files.push(newFile); 
     saveFiles();
     const fileElement = addFileToSidebar(newFile);
 
     // Ensure the file item is in the DOM before trying to rename
     requestAnimationFrame(() => {
-        selectFile(fileId); // Select the new file immediately
-        startRename(fileElement, fileId); // Start rename process
+        selectFile(fileId); 
+        startRename(fileElement, fileId); 
     });
-    editorContent.contentEditable = "true"; // Ensure editor is editable
+    editorContent.contentEditable = "true"; 
 }
 
 // Add file item to the sidebar UI
@@ -170,7 +170,7 @@ function addFileToSidebar(file) {
 
     const fileNameSpan = document.createElement('span');
     fileNameSpan.classList.add('file-name');
-    fileNameSpan.textContent = file.name || 'Untitled'; // Fallback name
+    fileNameSpan.textContent = file.name || 'Untitled'; 
     fileItem.appendChild(fileNameSpan);
 
     // --- Event Listeners for the file item ---
